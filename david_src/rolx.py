@@ -37,9 +37,10 @@ def extract_rolx_roles(G, n_roles=2):
     # print(H)
     
     # nodesense: node contribution to node measurements/features
-    K = make_sense(G, H)
+    K , NodeFeatueMatrix = make_sense(G, H)
     print("Role-feature matrix is of dimensions %s by %s" % K.shape)
     # print(K)
+    
     
     # add 'role' property to each node 
     node_role = np.asarray(H)
@@ -58,7 +59,7 @@ def extract_rolx_roles(G, n_roles=2):
     Q = complete_factor(H, np.asmatrix(N), h_on_left=True)
     print("Role-neighbor matrix is of dimensions %s by %s" % Q.shape)
     
-    return H, K, Q
+    return H, K, Q, NodeFeatueMatrix
 
 #Feature Extraction
 
@@ -223,6 +224,7 @@ def make_sense(G, H):
     feature_fns = [ getattr(G, f) for f in features ]
     feature_matrix = [ func() for func in feature_fns ]
     feature_matrix = np.matrix(feature_matrix).transpose()
+    NodeFeatueMatrix = feature_matrix.copy()
 
     #print(feature_matrix)
 
@@ -233,7 +235,7 @@ def make_sense(G, H):
     K = complete_factor(H, M, h_on_left=True)
     #print(K)
 
-    return K
+    return K, NodeFeatueMatrix
 
 def sense_residual_right_factor(K, H, M):
     K = np.matrix(K).reshape((H.shape[1], M.shape[1]))
